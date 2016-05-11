@@ -3,15 +3,15 @@
 
 #include <vector>
 
-const int RAND_NUM = 100000000;		//随机点数量
+const int RAND_NUM = 1000000;		//随机点数量
 const int MAX_OBJECT = 100;			//每个节点最大数量
 const int SEARCH_NUM = 15;			//需要搜索位置数量
 
-const int LB_X = 0;
-const int LB_Y = 0;
-const int RT_X = 100;
-const int RT_Y = 100;
-const int TREE_DEPTH = 5;
+const int LB_X = -180;
+const int LB_Y = -90;
+const int RT_X = 180;
+const int RT_Y = 90;
+const int TREE_DEPTH = 8;
 const int CHILD_NUM = 4;
 
 class QuadTree 
@@ -86,6 +86,7 @@ public:
 	void Search(int num, PosInfo pos_source, std::vector<PosInfo> &pos_list, QuadTreeNode *p_node);
 
 	QuadTree(int depth, int maxojects):m_depth(depth), m_maxobjects(maxojects), m_root(NULL){}
+	~QuadTree();
 
 	QuadTreeNode* GetTreeRoot() { return m_root; }
 	int			  GetDepth() { return m_depth; }

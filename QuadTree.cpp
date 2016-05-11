@@ -4,6 +4,11 @@
 
 using namespace std;
 
+QuadTree::~QuadTree()
+{
+
+}
+
 void QuadTree::InitQuadTreeNode(Rect rect)
 {
 	m_root = new QuadTreeNode;
@@ -33,10 +38,23 @@ void QuadTree::CreateQuadTreeNode(int depth, Rect rect, QuadTreeNode *p_node)
 
 void QuadTree::Split(QuadTreeNode *pNode)
 {
+	if (pNode == NULL)
+	{
+		return;
+	}
+
 	int start_x = pNode->rect.lb_x;
 	int start_y = pNode->rect.lb_y;
-	int sub_width = (pNode->rect.rt_x - pNode->rect.lb_x) / 2;
-	int sub_height = (pNode->rect.rt_y - pNode->rect.lb_y) / 2;
+	//int sub_width = (pNode->rect.rt_x - pNode->rect.lb_x) / 2;
+	//int sub_height = (pNode->rect.rt_y - pNode->rect.lb_y) / 2;
+	int la_sum = 0, lo_sum = 0;
+	for (std::vector<PosInfo>::iterator it = pNode->pos_array.begin(); it != pNode->pos_array.end(); ++it)
+	{
+		la_sum += (*it).latitude;
+		lo_sum += (*it).longitude;
+	}
+	int sub_width = (int)(la_sum * 1.0 / (int)pNode->pos_array.size());
+	int sub_height = (int)(lo_sum * 1.0 / (int)pNode->pos_array.size());
 	int end_x = pNode->rect.rt_x;
 	int end_y = pNode->rect.rt_y;
 
@@ -201,7 +219,7 @@ void QuadTree::PrintAllQuadTreeLeafNode(QuadTreeNode *p_node)
 
 	if (p_node->child_num == 0)
 	{
-		myfile<<"Node:["<<p_node->rect.lb_x<<", "<<p_node->rect.lb_y<<", "<<p_node->rect.rt_x<<", "<<p_node->rect.rt_y<<"]"<<endl;
+		myfile<<"Node:["<<p_node->rect.lb_x<<", "<<p_node->rect.lb_y<<", "<<p_node->rect.rt_x<<", "<<p_node->rect.rt_y<<"], Depth:"<<p_node->depth<<", PosNum:"<<(int)p_node->pos_array.size()<<endl;
 		myfile<<"{"<<endl;
 		for (std::vector<PosInfo>::iterator it = p_node->pos_array.begin(); it != p_node->pos_array.end(); ++it)
 		{
