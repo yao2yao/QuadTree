@@ -3,14 +3,14 @@
 
 #include <vector>
 
-const int RAND_NUM = 1000000;		//随机点数量
-const int MAX_OBJECT = 100;			//每个节点最大数量
+const int RAND_NUM = 10;			//随机点数量
+const int MAX_OBJECT = 5;			//每个节点最大数量
 const int SEARCH_NUM = 15;			//需要搜索位置数量
 
-const int LB_X = -180;
-const int LB_Y = -90;
-const int RT_X = 180;
-const int RT_Y = 90;
+const double LB_X = -180.0;
+const double LB_Y = -90.0;
+const double RT_X = 180.0;
+const double RT_Y = 90.0;
 const int TREE_DEPTH = 8;
 const int CHILD_NUM = 4;
 
@@ -39,7 +39,7 @@ public:
 	struct Rect
 	{
 		Rect():lb_x(0), lb_y(0), rt_x(0), rt_y(0){}
-		Rect(int lb_x, int lb_y, int rt_x, int rt_y): lb_x(lb_x), lb_y(lb_y), rt_x(rt_x), rt_y(rt_y){}
+		Rect(double lb_x, double lb_y, double rt_x, double rt_y): lb_x(lb_x), lb_y(lb_y), rt_x(rt_x), rt_y(rt_y){}
 		Rect& operator=(Rect &rect)
 		{
 			lb_x = rect.lb_x;
@@ -48,10 +48,10 @@ public:
 			rt_y = rect.rt_y;
 			return *this;
 		}
-		int lb_x;
-		int lb_y;
-		int rt_x;
-		int rt_y;
+		double lb_x;
+		double lb_y;
+		double rt_x;
+		double rt_y;
 	};
 
 	// 位置信息
@@ -67,6 +67,18 @@ public:
 	struct QuadTreeNode
 	{
 		QuadTreeNode(){}
+		~QuadTreeNode()
+		{
+			pos_array.clear();
+			for (int i = 0; i < CHILD_NUM; ++i)
+			{
+				if (child[i] == NULL)
+				{
+					break;
+				}
+				delete child[i];
+			}
+		}
 		Rect		rect;					//节点代表的矩形区域
 		std::vector<PosInfo> pos_array;		//节点中的位置信息
 		int			child_num;				//节点的孩子节点数量
@@ -80,6 +92,8 @@ public:
 	void Split(QuadTreeNode *p_node);											//分割节点
 	void Insert(PosInfo pos, QuadTreeNode *p_node);								//插入位置信息
 	int  GetIndex(PosInfo pos, QuadTreeNode *p_node);							//位置在节点的哪个象限
+	void Remove(PosInfo pos, QuadTreeNode *p_node);								//删除位置信息
+	void Find(PosInfo pos, QuadTreeNode *p_start, QuadTreeNode *p_target);		//查找位置
 	void PrintAllQuadTreeLeafNode(QuadTreeNode *p_node);						//打印所有叶子节点
 
 	//查找附近

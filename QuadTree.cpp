@@ -6,7 +6,7 @@ using namespace std;
 
 QuadTree::~QuadTree()
 {
-
+	delete m_root;
 }
 
 void QuadTree::InitQuadTreeNode(Rect rect)
@@ -35,7 +35,6 @@ void QuadTree::CreateQuadTreeNode(int depth, Rect rect, QuadTreeNode *p_node)
 	}
 }
 
-
 void QuadTree::Split(QuadTreeNode *pNode)
 {
 	if (pNode == NULL)
@@ -43,20 +42,20 @@ void QuadTree::Split(QuadTreeNode *pNode)
 		return;
 	}
 
-	int start_x = pNode->rect.lb_x;
-	int start_y = pNode->rect.lb_y;
+	double start_x = pNode->rect.lb_x;
+	double start_y = pNode->rect.lb_y;
 	//int sub_width = (pNode->rect.rt_x - pNode->rect.lb_x) / 2;
 	//int sub_height = (pNode->rect.rt_y - pNode->rect.lb_y) / 2;
-	int la_sum = 0, lo_sum = 0;
+	double la_sum = 0, lo_sum = 0;
 	for (std::vector<PosInfo>::iterator it = pNode->pos_array.begin(); it != pNode->pos_array.end(); ++it)
 	{
-		la_sum += (*it).latitude;
-		lo_sum += (*it).longitude;
+		la_sum += (*it).latitude - start_x;
+		lo_sum += (*it).longitude - start_y;
 	}
-	int sub_width = (int)(la_sum * 1.0 / (int)pNode->pos_array.size());
-	int sub_height = (int)(lo_sum * 1.0 / (int)pNode->pos_array.size());
-	int end_x = pNode->rect.rt_x;
-	int end_y = pNode->rect.rt_y;
+	double sub_width = (la_sum * 1.0 / (int)pNode->pos_array.size());
+	double sub_height = (lo_sum * 1.0 / (int)pNode->pos_array.size());
+	double end_x = pNode->rect.rt_x;
+	double end_y = pNode->rect.rt_y;
 
 	QuadTreeNode *p_node0 = new QuadTreeNode;
 	QuadTreeNode *p_node1 = new QuadTreeNode;
@@ -157,14 +156,13 @@ void QuadTree::Search(int num, PosInfo pos_source, std::vector<PosInfo> &pos_lis
 
 int QuadTree::GetIndex(PosInfo pos, QuadTreeNode *pNode)
 {
-	int start_x = pNode->rect.lb_x;
-	int start_y = pNode->rect.lb_y;
-	int sub_width = (pNode->rect.rt_x - pNode->rect.lb_x) / 2;
-	int sub_height = (pNode->rect.rt_y - pNode->rect.lb_y) / 2;
-	int end_x = pNode->rect.rt_x;
-	int end_y = pNode->rect.rt_y;
+	double start_x = pNode->rect.lb_x;
+	double start_y = pNode->rect.lb_y;
+	double sub_width = (pNode->rect.rt_x - pNode->rect.lb_x) / 2;
+	double sub_height = (pNode->rect.rt_y - pNode->rect.lb_y) / 2;
+	double end_x = pNode->rect.rt_x;
+	double end_y = pNode->rect.rt_y;
 	
-	start_x + sub_width, start_y + sub_height, end_x, end_y;
 	//0ÏóÏÞ
 	if ((pos.latitude >= start_x + sub_width) 
 	&& (pos.latitude <= end_x) 
@@ -200,6 +198,42 @@ int QuadTree::GetIndex(PosInfo pos, QuadTreeNode *pNode)
 	else
 	{
 		return INVALID;
+	}
+}
+
+void QuadTree::Remove(PosInfo pos, QuadTreeNode* p_node)
+{
+	if (p_node == NULL)
+	{
+		return;
+	}
+
+// 	for (std::vector<PosInfo>::iterator it = p_node->pos_array.begin(); it != p_node->pos_array.end(); ++it)
+// 	{
+// 		if (pos.user_id == (*it).user_id)
+// 		{
+// 			p_node->pos_array.erase(it);
+// 			break;
+// 		}
+// 	}
+}
+
+void QuadTree::Find(PosInfo pos, QuadTreeNode *p_start, QuadTreeNode *p_target)
+{
+	if (p_start == NULL)
+	{
+		return;
+	}
+
+	p_target = p_start;
+
+	int index = GetIndex(pos, p_start);
+	if (index >= UR && index <= LR)
+	{
+		if (p_start->child[index] != NULL)
+		{
+			Find(pos, p_start->child[index], p_target);
+		}
 	}
 }
 
